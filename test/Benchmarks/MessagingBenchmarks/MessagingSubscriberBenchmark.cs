@@ -2,9 +2,12 @@
 using BenchmarkDotNet.Attributes.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Kafka;
 using NBB.Messaging.Nats;
+using NBB.Tenancy.Abstractions;
+using NBB.Tenancy.Impl;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -15,6 +18,20 @@ using System.Threading.Tasks;
 
 namespace MessagingBenchmarks
 {
+    class ApplicationLifetime : IApplicationLifetime
+    {
+        public CancellationToken ApplicationStarted => throw new NotImplementedException();
+
+        public CancellationToken ApplicationStopping => throw new NotImplementedException();
+
+        public CancellationToken ApplicationStopped => throw new NotImplementedException();
+
+        public void StopApplication()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 1)]
     public class MessagingSubscriberBenchmark
     {
@@ -72,6 +89,8 @@ namespace MessagingBenchmarks
             var configuration = configurationBuilder.Build();
 
             var services = new ServiceCollection();
+            services.AddSingleton<IApplicationLifetime, ApplicationLifetime>();
+            services.AddSingleton<ITenantConfig, TenantConfig>();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
@@ -89,7 +108,6 @@ namespace MessagingBenchmarks
                 Parallel.ForEach(messages, async m =>
                 {
                     await pub.PublishAsync(m, CancellationToken.None);
-
                 });
             }
         }
@@ -104,7 +122,7 @@ namespace MessagingBenchmarks
 
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
-                await sub.SubscribeAsync(async e =>
+                await sub.SubscribeAsync(async (e) =>
                 {
                     stopWatch.Stop();
                     var ms = stopWatch.ElapsedMilliseconds;

@@ -17,16 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="NATS.Client" Version="0.8.1" />
+    <PackageReference Include="NATS.Client" Version="0.10.0" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Include="STAN.Client" Version="0.1.5" />
+    <PackageReference Include="STAN.Client" Version="0.2.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\samples\MicroServices\NBB.Contracts\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
+    <ProjectReference Include="..\..\..\samples\MicroServices\NBB.Contracts\NBB.Contracts.Domain\NBB.Contracts.Domain.csproj" />
+    <ProjectReference Include="..\..\Tenancy\NBB.Tenancy.Abstractions\NBB.Tenancy.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Tenancy\NBB.Tenancy.Impl\NBB.Tenancy.Impl.csproj" />
     <ProjectReference Include="..\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
   </ItemGroup>
 </Project>

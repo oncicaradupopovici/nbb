@@ -1,5 +1,4 @@
-﻿using System;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 namespace TheBenchmarks
 {
     class Program
@@ -7,12 +6,17 @@ namespace TheBenchmarks
         static void Main(string[] args)
         {
             //var summary = BenchmarkRunner.Run<EventStoreBenchmark>();
-            var summary = BenchmarkRunner.Run<EventSourcedRepositoryBenchmark>();
+            //  var summary = BenchmarkRunner.Run<EventSourcedRepositoryBenchmark>();
 
             //var benchmark = new EventSourcedRepositoryBenchmark();
             //benchmark.NumberOfEvents = 1;
             //benchmark.GlobalSetupLoadAndSaveAggregateWithoutSnapshot();
             //benchmark.LoadAndSaveAggregateWithoutSnapshot();
+            var summary = BenchmarkRunner.Run<MultiTenancyBenchmark>();
+
+            //MultiTenancyBenchmark multiTenancyBenchmark = new MultiTenancyBenchmark();
+            //multiTenancyBenchmark.NatsGlobalSetup();
+            //multiTenancyBenchmark.SubscribeToTopicAsyncBecnh().Wait();
         }
     }
 }

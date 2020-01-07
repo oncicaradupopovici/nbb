@@ -11,6 +11,8 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>NBB_Contracts_6a73f87d-2175-4be0-9a42-31cb73bc8e10</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\..\..\..</DockerfileContext>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,9 +44,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Kafka\NBB.Messaging.Kafka.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\NBB.Contracts.Application.Commands\NBB.Contracts.Application.Commands.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.Domain\NBB.Contracts.Domain.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
   </ItemGroup>
 

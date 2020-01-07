@@ -7,10 +7,10 @@ namespace MessagingBenchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<MessagingPublisherBenchmark>();
-            //var b = new MessagingSubscriberBenchmark();
-            //b.KafkaGlobalSetup();
-            //b.KafkaSubcribeTest().Wait();
+            //var summary = BenchmarkRunner.Run<MessagingPublisherBenchmark>();
+            var b = new MessagingSubscriberBenchmark();
+            b.NatsGlobalSetup();
+            b.NatsSubscribeTest().Wait();
         }
     }
 }

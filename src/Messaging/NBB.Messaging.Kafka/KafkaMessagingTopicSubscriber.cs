@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Kafka
 {
-    public class KafkaMessagingTopicSubscriber: IMessagingTopicSubscriber, IDisposable
+    public class KafkaMessagingTopicSubscriber : IMessagingTopicSubscriber, IDisposable
     {
         private Consumer<string, string> _consumer;
         private readonly ILogger<KafkaMessagingTopicSubscriber> _logger;
@@ -48,7 +48,7 @@ namespace NBB.Messaging.Kafka
 
         private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
-            
+
 
             _consumer.OnPartitionsAssigned += (_, partitions) =>
             {
@@ -83,7 +83,7 @@ namespace NBB.Messaging.Kafka
         }
 
 
-        private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken cancellationToken = default)
+        private async Task Poll(string topicName, Func<string, Task> handler, Consumer<string, string> consumer, CancellationToken cancellationToken = default)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -137,6 +137,11 @@ namespace NBB.Messaging.Kafka
                 new StringDeserializer(Encoding.UTF8));
 
             return consumer;
+        }
+
+        public Task SubscribeToMultipleTopicsAsync(IEnumerable<string> topics, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

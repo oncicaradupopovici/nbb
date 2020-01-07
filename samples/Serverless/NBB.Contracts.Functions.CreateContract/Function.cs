@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,15 +21,21 @@ using NBB.Mediator.OpenFaaS.Extensions;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 using NBB.Messaging.Nats.Internal;
+using NBB.Tenancy.Impl;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Functions.CreateContract
 {
     public class Function
     {
         private ServiceProvider _container;
-     
+
         public void PrepareFunctionContext()
         {
             _container = BuildServiceProvider();
@@ -47,12 +48,12 @@ namespace NBB.Contracts.Functions.CreateContract
             {
                 using (var scope = _container.CreateScope())
                 {
-                    var command = GetCommandFromBuffer(body);
-                    var commandHandler = scope.ServiceProvider.GetService<IRequestHandler<Application.Commands.CreateContract>>();
-                    if (commandHandler != null)
-                    {
-                        await commandHandler.Handle(command, cancellationToken);
-                    }
+                    //var command = GetCommandFromBuffer(body);
+                    //var commandHandler = scope.ServiceProvider.GetService<IRequestHandler<Application.Commands.CreateContract>>();
+                    //if (commandHandler != null)
+                    //{
+                    //    await commandHandler.Handle(command, cancellationToken);
+                    //}
                 }
             }
 
@@ -106,11 +107,11 @@ namespace NBB.Contracts.Functions.CreateContract
             services.AddContractsWriteModelDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository()
                 .WithMessagingExtensions();
 
-            services.AddScoped<IRequestHandler<NBB.Contracts.Application.Commands.CreateContract>, ContractCommandHandlers>();
+            //services.AddScoped<IRequestHandler<NBB.Contracts.Application.Commands.CreateContract>, ContractCommandHandlers>();
 
             var container = services.BuildServiceProvider();
             return container;
@@ -149,7 +150,8 @@ namespace NBB.Contracts.Functions.CreateContract
             var messageTypeRegistry = new DefaultMessageTypeRegistry();
             var messageSerdes = new NewtonsoftJsonMessageSerDes(messageTypeRegistry);
             var messagingTopicPublisher = new NatsMessagingTopicPublisher(stanConnectionProvider, new Logger<NatsMessagingTopicPublisher>(loggerFactory));
-            var messageBusPublisher = new MessageBusPublisher(messagingTopicPublisher, topicRegistry, messageSerdes, configuration, new Logger<MessageBusPublisher>(loggerFactory));
+            var tenantStore = new TenantConfig(configuration);
+            var messageBusPublisher = new MessageBusPublisher(messagingTopicPublisher, topicRegistry, messageSerdes, configuration, new Logger<MessageBusPublisher>(loggerFactory), tenantStore);
 
             var scripts = new Scripts();
             var eventRepository = new AdoNetEventRepository(scripts, configuration, new Logger<AdoNetEventRepository>(loggerFactory));
@@ -158,7 +160,7 @@ namespace NBB.Contracts.Functions.CreateContract
             var eventStore = new EventStore.EventStore(eventRepository, eventStoreSerDes, new Logger<EventStore.EventStore>(loggerFactory));
             var eventStoreDecorator = new MessagingEventStoreDecorator(eventStore, messageBusPublisher, new MessagingTopicResolver(configuration));
             var mediator = new OpenFaaSMediator(configuration, new Logger<OpenFaaSMediator>(loggerFactory));
-            var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(),  new Logger<EventSourcedRepository<Contract>>(loggerFactory));
+            var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(), new Logger<EventSourcedRepository<Contract>>(loggerFactory));
             var result = new ContractCommandHandlers(repository);
 
             //disposables = new List<IDisposable>{stanConnectionProvider};
@@ -172,9 +174,9 @@ namespace NBB.Contracts.Functions.CreateContract
             return null;
         }
 
-        private static NBB.Contracts.Application.Commands.CreateContract GetCommandFromBuffer(string buffer)
+        private static NBB.Contracts.Application.Commands.Msg1 GetCommandFromBuffer(string buffer)
         {
-            return new NBB.Contracts.Application.Commands.CreateContract(Guid.NewGuid());
+            return new NBB.Contracts.Application.Commands.Msg1(Guid.NewGuid());
         }
 
     }

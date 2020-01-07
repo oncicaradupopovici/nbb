@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using NBB.Core.Abstractions;
+﻿using Microsoft.Extensions.Configuration;
+using NBB.Messaging.Abstractions.Hadlers;
 using NBB.Messaging.DataContracts;
+using System;
+using System.Linq;
 
 namespace NBB.Messaging.Abstractions
 {
@@ -16,33 +16,7 @@ namespace NBB.Messaging.Abstractions
         }
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
-        {
-            var topic = GetTopicNameFromAttribute(messageType);
-            if (topic == null)
-            {
-                if (typeof(ICommand).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.commands.{messageType.GetLongPrettyName()}";
-                }
-                else if (typeof(IEvent).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.events.{messageType.GetLongPrettyName()}";
-                }
-                else if (typeof(IQuery).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.queries.{messageType.GetLongPrettyName()}";
-                }
-                else
-                {
-                    topic = $"ch.messages.{messageType.GetLongPrettyName()}";
-                }
-            }
-
-            
-            topic = GetTopicForName(topic, includePrefix);
-
-            return topic;
-        }
+            => GetTopicForName(GetTopic(messageType), includePrefix);
 
         public string GetTopicForName(string topicName, bool includePrefix = true)
         {
@@ -52,13 +26,26 @@ namespace NBB.Messaging.Abstractions
             }
 
             var topic = (includePrefix ? GetTopicPrefix() : string.Empty) + topicName;
-            topic = topic.Replace("+", ".");
-            topic = topic.Replace("<", "_");
-            topic = topic.Replace(">", "_");
-
-            return topic;
+            return GetModifiedTopic(ref topic);
         }
 
+        public string GetTopicForTopicPrefix(Type messageType, string topicPrefix)
+          => topicPrefix + "." + GetTopic(messageType);
+
+        public string GetSharedTopicPrefix()
+            => _configuration.GetSection("Messaging")["SharedTopicPrefix"];
+
+        public string GetTopicPrefixFromTopic(string topic)
+            => topic.Split('.')[0] + ".";
+
+
+
+        
+        private string GetModifiedTopic(ref string topic)
+           => topic.Replace("+", ".").Replace("<", "_").Replace(">", "_");
+
+        private string GetTopicPrefix()
+            => _configuration.GetSection("Messaging")?["TopicPrefix"] ?? "";
 
         private string GetTopicNameFromAttribute(Type messageType)
         {
@@ -66,10 +53,18 @@ namespace NBB.Messaging.Abstractions
             return topicNameResolver?.ResolveTopicName(messageType, _configuration);
         }
 
-        private string GetTopicPrefix()
+        private string GetTopic(Type messageType)
         {
-            var topicPrefix = _configuration.GetSection("Messaging")?["TopicPrefix"];
-            return topicPrefix ?? "";
+            var topic = GetTopicNameFromAttribute(messageType);
+            if (topic == null)
+            {
+                topic = new CommandTypeValidatorHandler()
+                    .Then(new EventTypeValidatorHandler())
+                    .Then(new QueryTypeValidatorHandler())
+                    .Then(new DefaultTypeHandler()).Handle(messageType);
+            }
+
+            return topic;
         }
     }
 }

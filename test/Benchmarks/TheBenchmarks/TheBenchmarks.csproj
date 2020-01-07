@@ -36,9 +36,16 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\samples\MicroServices\NBB.Contracts\NBB.Contracts.Application.Commands\NBB.Contracts.Application.Commands.csproj" />
+    <ProjectReference Include="..\..\..\samples\MicroServices\NBB.Contracts\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
+    <ProjectReference Include="..\..\..\samples\MicroServices\NBB.Contracts\NBB.Contracts.Domain\NBB.Contracts.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\Data\NBB.Data.EventSourcing\NBB.Data.EventSourcing.csproj" />
     <ProjectReference Include="..\..\..\src\Domain\NBB.Domain\NBB.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Migrations\NBB.EventStore.AdoNet.Migrations.csproj" />

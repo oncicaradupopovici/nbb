@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NBB.Contracts.Application.CommandHandlers;
+using NBB.Contracts.Domain.ServicesContracts;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats.Internal;
+using NBB.Tenancy.Abstractions;
+using NBB.Tenancy.Impl;
 
 namespace NBB.Messaging.Nats
 {
@@ -19,6 +20,11 @@ namespace NBB.Messaging.Nats
             services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();
             services.AddSingleton<IMessageSerDes, NewtonsoftJsonMessageSerDes>();
             services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
+        }
+
+        public static void AddTenancy(this IServiceCollection services)
+        {
+            services.AddSingleton<ITenantConfig, TenantConfig>();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NBB.Contracts.Application.Commands;
 using NBB.Contracts.ReadModel;
 using NBB.Messaging.Abstractions;
 using System;
@@ -47,25 +46,25 @@ namespace NBB.Contracts.Api.Controllers
         }
 
         // POST api/contracts
-        [HttpPost]
-        public Task Post([FromBody]CreateContract command, CancellationToken cancellationToken)
-        {
-            return _messageBusPublisher.PublishAsync(command, cancellationToken);
-        }
+        //[HttpPost]
+        //public Task Post([FromBody]CreateContract command, CancellationToken cancellationToken)
+        //{
+        //    return _messageBusPublisher.PublishAsync(command, cancellationToken);
+        //}
 
-        // POST api/contracts/7327223E-22EA-48DC-BC44-FFF6AB3B9489/lines
-        [HttpPost("{id}/lines")]
-        public Task Post([FromBody]AddContractLine command, CancellationToken cancellationToken)
-        {
-            return _messageBusPublisher.PublishAsync(command, cancellationToken);
-        }
+        //// POST api/contracts/7327223E-22EA-48DC-BC44-FFF6AB3B9489/lines
+        //[HttpPost("{id}/lines")]
+        //public Task Post([FromBody]AddContractLine command, CancellationToken cancellationToken)
+        //{
+        //    return _messageBusPublisher.PublishAsync(command, cancellationToken);
+        //}
 
-        // POST api/contracts/7327223E-22EA-48DC-BC44-FFF6AB3B9489/validate
-        [HttpPost("{id}/validate")]
-        public Task Post([FromBody]ValidateContract command, CancellationToken cancellationToken)
-        {
-            return _messageBusPublisher.PublishAsync(command, cancellationToken);
-        }
+        //// POST api/contracts/7327223E-22EA-48DC-BC44-FFF6AB3B9489/validate
+        //[HttpPost("{id}/validate")]
+        //public Task Post([FromBody]ValidateContract command, CancellationToken cancellationToken)
+        //{
+        //    return _messageBusPublisher.PublishAsync(command, cancellationToken);
+        //}
 
     }
 }

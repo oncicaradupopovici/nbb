@@ -4,6 +4,7 @@ using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats.Internal;
 using STAN.Client;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,10 +15,10 @@ namespace NBB.Messaging.Nats
         private readonly StanConnectionProvider _stanConnectionManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<NatsMessagingTopicSubscriber> _logger;
+        private readonly Dictionary<string, bool> _topics
+            = new Dictionary<string, bool>();
 
-        private bool _subscribedToTopic;
-
-        public NatsMessagingTopicSubscriber(StanConnectionProvider stanConnectionManager, IConfiguration configuration, 
+        public NatsMessagingTopicSubscriber(StanConnectionProvider stanConnectionManager, IConfiguration configuration,
             ILogger<NatsMessagingTopicSubscriber> logger)
         {
             _stanConnectionManager = stanConnectionManager;
@@ -27,16 +28,17 @@ namespace NBB.Messaging.Nats
 
         public Task SubscribeAsync(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
-            if (!_subscribedToTopic)
+            if (!_topics.TryGetValue(topic, out _))
             {
                 lock (this)
                 {
-                    if (!_subscribedToTopic)
+                    if (!_topics.TryGetValue(topic, out _))
                     {
-                        _subscribedToTopic = true;
+                        _topics.Add(topic, true);
                         return SubscribeToTopicAsync(topic, handler, cancellationToken, options);
                     }
                 }
+
             }
 
             return Task.CompletedTask;
@@ -54,11 +56,11 @@ namespace NBB.Messaging.Nats
             var qGroup = _configuration.GetSection("Messaging").GetSection("Nats")["qGroup"];
             var subscriberOptions = options ?? new MessagingSubscriberOptions();
             opts.ManualAcks = subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
-            
+
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
             opts.MaxInflight = 1;
             opts.AckWait = 50000;
-            
+
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
                 _logger.LogDebug("Nats subscriber {QGroup} received message from subject {Subject}", qGroup,
@@ -93,7 +95,7 @@ namespace NBB.Messaging.Nats
                     ? stanConnection.Subscribe(subject, opts, StanMsgHandler)
                     : stanConnection.Subscribe(subject, qGroup, opts, StanMsgHandler);
             });
-            
+
 
             return Task.CompletedTask;
         }

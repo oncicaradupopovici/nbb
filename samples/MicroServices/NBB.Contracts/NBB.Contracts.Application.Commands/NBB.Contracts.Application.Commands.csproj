@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AddContractLine.cs" />
+    <Compile Remove="CreateContract.cs" />
+    <Compile Remove="ValidateContract.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="NBB.Contracts.Application.Commands.csproj.vspscc" />
   </ItemGroup>
 

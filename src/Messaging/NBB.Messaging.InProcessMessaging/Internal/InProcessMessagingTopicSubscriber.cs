@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NBB.Messaging.Abstractions;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,6 +57,11 @@ namespace NBB.Messaging.InProcessMessaging.Internal
         }
 
         public Task UnSubscribeAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task SubscribeToMultipleTopicsAsync(IEnumerable<string> topics, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             return Task.CompletedTask;
         }

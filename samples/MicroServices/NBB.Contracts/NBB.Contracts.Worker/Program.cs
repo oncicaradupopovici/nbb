@@ -16,10 +16,11 @@ using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Nats;
 using NBB.Resiliency;
+using NBB.Tenancy.Impl;
 using Serilog;
 using Serilog.Events;
+using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Contracts.Worker
@@ -33,6 +34,12 @@ namespace NBB.Contracts.Worker
 
         public static async Task MainAsync(string[] args)
         {
+            string tenantId = null;
+            if (args[0] != null)
+            {
+                tenantId = args[0];
+            }
+
             var builder = new HostBuilder()
                 .ConfigureHostConfiguration(config =>
                 {
@@ -53,6 +60,11 @@ namespace NBB.Contracts.Worker
                 {
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
+                    TenantConfig tenantStore = new TenantConfig(hostingContext.Configuration);
+
+                    var tenantType = tenantStore.GetTenantType(tenantId); // This logic need to be somewhere else
+                    hostingContext.Configuration.GetSection("Messaging")["TenantPrefix"] = tenantId;
+
                     Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Information()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -69,15 +81,15 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
+                    services.AddTenancy();
+
                     //services.AddKafkaMessaging();
                     services.AddNatsMessaging();
-
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();
 
-
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
                     services.AddResiliency();

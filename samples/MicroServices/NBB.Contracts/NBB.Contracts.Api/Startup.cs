@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.Contracts.Application.CommandHandlers;
+using NBB.Contracts.Domain.ServicesContracts;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 
 namespace NBB.Contracts.Api
@@ -21,11 +25,13 @@ namespace NBB.Contracts.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IConfiguration>(Configuration);
-
+            services.AddSingleton(Configuration);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddKafkaMessaging();
+            services.AddTenancy();
+            services.AddSingleton<ITenantService, TenantService>();
             services.AddNatsMessaging();
-
+            services.Decorate<IMessageBusPublisher, TenantBusPublisherDecorator>();
             services.AddContractsReadModelDataAccess();
         }
 

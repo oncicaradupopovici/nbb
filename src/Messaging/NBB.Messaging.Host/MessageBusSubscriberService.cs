@@ -6,6 +6,7 @@ using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.DataContracts;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,11 +21,10 @@ namespace NBB.Messaging.Host
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
 
         public MessageBusSubscriberService(
-            IMessageBusSubscriber<TMessage> messageBusSubscriber, 
+            IMessageBusSubscriber<TMessage> messageBusSubscriber,
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
-            ILogger<MessageBusSubscriberService<TMessage>> logger,
-            MessagingSubscriberOptions subscriberOptions = null
+            ILogger<MessageBusSubscriberService<TMessage>> logger, MessagingSubscriberOptions subscriberOptions = null
             )
         {
             _subscriberOptions = subscriberOptions;
@@ -40,7 +40,12 @@ namespace NBB.Messaging.Host
 
             Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, cancellationToken);
 
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
             await _messageBusSubscriber.SubscribeAsync(HandleMsg, cancellationToken, null, _subscriberOptions);
+            stopWatch.Stop();
+            _logger.LogInformation("SubscribeAsync took {ElapsedMilliseconds} ms", stopWatch.ElapsedMilliseconds);
+
             await cancellationToken.WhenCanceled();
             await _messageBusSubscriber.UnSubscribeAsync(HandleMsg, CancellationToken.None);
 
