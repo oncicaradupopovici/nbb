@@ -3,6 +3,9 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
+COPY NuGet.config .
+COPY dependencies.props .
+COPY Directory.Build.props .
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.Worker/NBB.Contracts.Worker.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.Worker/"]
 COPY ["src/Messaging/NBB.Messaging.Host/NBB.Messaging.Host.csproj", "src/Messaging/NBB.Messaging.Host/"]
 COPY ["src/Messaging/NBB.Messaging.Abstractions/NBB.Messaging.Abstractions.csproj", "src/Messaging/NBB.Messaging.Abstractions/"]
