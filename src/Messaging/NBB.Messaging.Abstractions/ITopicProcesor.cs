@@ -4,4 +4,9 @@
     {
         string Execute(string text);
     }
+
+    public interface IDefaultTopicProcesor : ITopicProcesor
+    {
+        string Execute();
+    }
 }
