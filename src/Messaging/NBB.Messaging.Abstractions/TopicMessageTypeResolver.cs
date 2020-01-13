@@ -29,9 +29,6 @@ namespace NBB.Messaging.Abstractions
             return topicNameResolver?.ResolveTopicName(messageType, _configuration);
         }
 
-        public string Execute(string text)
-        {
-            return text;
-        }
+        public string Execute(string text) => Execute();
     }
 }

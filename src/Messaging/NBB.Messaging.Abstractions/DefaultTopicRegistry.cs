@@ -14,15 +14,14 @@ namespace NBB.Messaging.Abstractions
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true) =>
             new TopicNameResolver(includePrefix, _configuration).
-                Then(new TopicMessageTypeResolver(_configuration, messageType)).Execute("");
+                Then(new TopicMessageTypeResolver(_configuration, messageType)).Execute(string.Empty);
 
         public string GetTopicForName(string topicName, bool includePrefix = true) =>
             new TopicNameResolver(includePrefix, _configuration).Execute(topicName);
 
         public string GetTopicForTopicPrefix(Type messageType, string topicPrefix) =>
             new TopicPrefixConcatenateProcessor(topicPrefix).Then(
-                new TopicMessageTypeResolver(_configuration, messageType)
-            ).Execute("");
+                new TopicMessageTypeResolver(_configuration, messageType)).Execute(string.Empty);
 
         public string GetSharedTopicPrefix()
             => _configuration.GetSection("Messaging")["SharedTopicPrefix"];
