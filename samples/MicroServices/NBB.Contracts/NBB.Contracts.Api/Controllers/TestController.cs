@@ -35,9 +35,8 @@ namespace NBB.Contracts.Api.Controllers
             commands.Add(new Msg15(Guid.NewGuid()));
         }
 
-        // POST api/test/OnlyAMessage sent
-        [HttpPost("one")]
-        public async Task ScenarioOne([FromBody]Msg1 command, CancellationToken cancellationToken)
+        [HttpPost("oneWithoutSyncOp")]
+        public async Task ScenarioOneWithoutSyncOp([FromBody]Msg1 command, CancellationToken cancellationToken)
         {
             var list = new List<Task>();
             for (int i = 0; i < 1000; i++)
@@ -46,7 +45,16 @@ namespace NBB.Contracts.Api.Controllers
             await Task.WhenAll(list);
         }
 
-        // POST api/test/OnlyAMessage sent
+        [HttpPost("oneWithSyncOp")]
+        public async Task ScenarioOneWithSyncOp([FromBody]Msg2 command, CancellationToken cancellationToken)
+        {
+            var list = new List<Task>();
+            for (int i = 0; i < 1000; i++)
+                list.Add(_messageBusPublisher.PublishAsync(command, cancellationToken));
+
+            await Task.WhenAll(list);
+        }
+
         [HttpPost("two")]
         public async Task ScenarioTwo([FromBody]Msg2 command, CancellationToken cancellationToken)
         {
@@ -58,7 +66,7 @@ namespace NBB.Contracts.Api.Controllers
         {
             var list = new List<Task>();
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
                 list.Add(_messageBusPublisher.PublishAsync(command, cancellationToken));
 
             await Task.WhenAll(list);
@@ -68,7 +76,7 @@ namespace NBB.Contracts.Api.Controllers
         public async Task ScenarioThree(CancellationToken cancellationToken)
         {
             var list = new List<Task>();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 100000; i++)
             {
                 foreach (var cmd in commands)
                     list.Add(_messageBusPublisher.PublishAsync(cmd, cancellationToken));

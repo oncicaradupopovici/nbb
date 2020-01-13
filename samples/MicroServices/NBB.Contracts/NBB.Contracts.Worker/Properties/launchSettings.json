@@ -8,7 +8,8 @@
       }
     },
     "Docker": {
-      "commandName": "Docker"
+      "commandName": "Docker",
+      "commandLineArgs": "\" \""
     }
   }
 }
