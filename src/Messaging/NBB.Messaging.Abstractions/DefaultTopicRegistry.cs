@@ -2,6 +2,7 @@
 using NBB.Messaging.Abstractions.Hadlers;
 using NBB.Messaging.DataContracts;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NBB.Messaging.Abstractions
@@ -15,8 +16,19 @@ namespace NBB.Messaging.Abstractions
             _configuration = configuration;
         }
 
+        private IEnumerable<RuleValue> Rules { get; } = new[]
+        {
+            new RuleValue("+", "."),
+            new RuleValue("<", "_"),
+            new RuleValue(">", "_"),
+        };
+
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
-            => GetTopicForName(GetTopic(messageType), includePrefix);
+        {
+            var topic = GetTopic(messageType);
+            topic = GetTopicForName(topic, includePrefix);
+            return topic;
+        }
 
         public string GetTopicForName(string topicName, bool includePrefix = true)
         {
@@ -40,9 +52,8 @@ namespace NBB.Messaging.Abstractions
 
 
 
-        
-        private string GetModifiedTopic(ref string topic)
-           => topic.Replace("+", ".").Replace("<", "_").Replace(">", "_");
+        private string GetModifiedTopic(ref string topic) =>
+            topic = Rules.Aggregate(topic, (current, rule) => current.Replace(rule.OldValue, rule.NewValue));
 
         private string GetTopicPrefix()
             => _configuration.GetSection("Messaging")?["TopicPrefix"] ?? "";
@@ -53,18 +64,10 @@ namespace NBB.Messaging.Abstractions
             return topicNameResolver?.ResolveTopicName(messageType, _configuration);
         }
 
-        private string GetTopic(Type messageType)
-        {
-            var topic = GetTopicNameFromAttribute(messageType);
-            if (topic == null)
-            {
-                topic = new CommandTypeValidatorHandler()
-                    .Then(new EventTypeValidatorHandler())
-                    .Then(new QueryTypeValidatorHandler())
-                    .Then(new DefaultTypeHandler()).Handle(messageType);
-            }
-
-            return topic;
-        }
+        private string GetTopic(Type messageType) =>
+            GetTopicNameFromAttribute(messageType) ?? new CommandTypeValidatorHandler()
+                .Then(new EventTypeValidatorHandler())
+                .Then(new QueryTypeValidatorHandler())
+                .Then(new DefaultTypeHandler()).Handle(messageType);
     }
 }
