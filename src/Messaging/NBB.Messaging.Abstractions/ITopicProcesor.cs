@@ -5,8 +5,8 @@
         string Execute(string text);
     }
 
-    public interface IDefaultTopicProcesor : ITopicProcesor
+    public interface IDefaultTopicProcesor
     {
-        string Execute();
+        string GetTopic();
     }
 }

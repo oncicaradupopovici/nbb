@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NBB.Messaging.Abstractions
 {
@@ -29,15 +28,10 @@ namespace NBB.Messaging.Abstractions
                 return null;
             }
 
-            var topic = (_includePrefix ? GetTopicPrefix() : string.Empty) + text;
-            return GetModifiedTopic(ref topic);
+            return (_includePrefix ? GetTopicPrefix() : string.Empty) + text;
         }
 
         private string GetTopicPrefix()
             => _configuration.GetSection("Messaging")?["TopicPrefix"] ?? "";
-
-
-        private string GetModifiedTopic(ref string topic) =>
-            topic = Rules.Aggregate(topic, (current, rule) => current.Replace(rule.OldValue, rule.NewValue));
     }
 }
