@@ -16,7 +16,7 @@ namespace TheBenchmarks
 
             //MultiTenancyBenchmark multiTenancyBenchmark = new MultiTenancyBenchmark();
             //multiTenancyBenchmark.NatsGlobalSetup();
-            //multiTenancyBenchmark.SubscribeToTopicAsyncBecnh().Wait();
+            //multiTenancyBenchmark.SubscribeToTopicAsyncBecnh(1000);
         }
     }
 }

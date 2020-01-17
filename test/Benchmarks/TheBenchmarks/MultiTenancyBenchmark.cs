@@ -42,7 +42,7 @@ namespace TheBenchmarks
         }
     }
 
-    //[SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 1)]
+    [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 1)]
     //[HtmlExporter]
     //[RPlotExporter, RankColumn]
     public class MultiTenancyBenchmark
@@ -99,63 +99,17 @@ namespace TheBenchmarks
             return services;
         }
 
-        private void SeedTopic()
-        {
-            using (var scope = _container.CreateScope())
-            {
-                var pub = scope.ServiceProvider.GetService<IMessageBusPublisher>();
-                var messages = Enumerable.Range(0, _msgsCnt)
-                    .Select(i => new Msg1(Guid.NewGuid()));
-
-                Parallel.ForEach(messages, async m =>
-                {
-                    await pub.PublishAsync(m, CancellationToken.None);
-                });
-            }
-        }
-
         [Benchmark]
-        [MemoryDiagnoser]
         [Arguments(1000)]
-        [Arguments(2000)]
-        [Arguments(5000)]
         [Arguments(10000)]
-        [Arguments(20000)]
-        [Arguments(100000)]
-        [Arguments(200000)]
-        [Arguments(300000)]
         [Arguments(500000)]
-        public async Task SubscribeToTopicAsyncBecnh(int numberOfSubscriptions)
+        public void SubscribeToTopicAsyncBecnh(int numberOfSubscriptions)
         {
             var list = new List<Task>();
             for (int i = 0; i < numberOfSubscriptions; i++)
                 list.Add(SubscribeToTopicAsync($"Tenant_{i}", msg => Task.CompletedTask));
 
-            await Task.WhenAll(list);
-
-            //await RawSubscribe();
-        }
-
-        public async Task RawSubscribe()
-        {
-            var opts = StanSubscriptionOptions.GetDefaultOptions();
-            opts.DurableName = "durable";
-            var qGroup = "NBB.Benchmark";
-            var subscriberOptions = new MessagingSubscriberOptions();
-            opts.ManualAcks = subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
-            opts.MaxInflight = 1;
-            opts.AckWait = 50000;
-
-            void StanMsgHandler(object obj, StanMsgHandlerArgs args) { }
-
-            var randonNumber = new Random().Next(0, 300000);
-
-            _stanConnectionManager.Execute(stanConnection =>
-            {
-                var _ = subscriberOptions.ConsumerType == MessagingConsumerType.CollaborativeConsumer
-                    ? stanConnection.Subscribe($"test_{randonNumber}", opts, StanMsgHandler)
-                    : stanConnection.Subscribe($"test_{randonNumber}", qGroup, opts, StanMsgHandler);
-            });
+            Task.WhenAll(list).GetAwaiter().GetResult();
         }
 
         public Task SubscribeToTopicAsync(string subject, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
