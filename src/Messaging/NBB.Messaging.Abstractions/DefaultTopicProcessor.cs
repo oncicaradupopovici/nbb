@@ -6,27 +6,18 @@ using System.Linq;
 
 namespace NBB.Messaging.Abstractions
 {
-    public class DefaultTopicProcessor : IDefaultTopicProcesor
+    static class DefaultTopicProcessor
     {
-        private readonly IConfiguration _configuration;
-        private readonly Type _messageType;
-
-        public DefaultTopicProcessor(IConfiguration configuration, Type messageType)
-        {
-            _configuration = configuration;
-            _messageType = messageType;
-        }
-
-        public string GetTopic() =>
-            GetTopicNameFromAttribute(_messageType) ?? new CommandTypeValidatorHandler()
+        public static string GetTopic(Type messageType, IConfiguration configuration) =>
+            GetTopicNameFromAttribute(messageType, configuration) ?? new CommandTypeValidatorHandler()
                 .Then(new EventTypeValidatorHandler())
                 .Then(new QueryTypeValidatorHandler())
-                .Then(new DefaultTypeHandler()).Handle(_messageType);
+                .Then(new DefaultTypeHandler()).Handle(messageType);
 
-        private string GetTopicNameFromAttribute(Type messageType)
+        private static string GetTopicNameFromAttribute(Type messageType, IConfiguration configuration)
         {
             var topicNameResolver = messageType.GetCustomAttributes(typeof(TopicNameResolverAttribute), true).FirstOrDefault() as TopicNameResolverAttribute;
-            return topicNameResolver?.ResolveTopicName(messageType, _configuration);
+            return topicNameResolver?.ResolveTopicName(messageType, configuration);
         }
     }
 }

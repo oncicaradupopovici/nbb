@@ -4,9 +4,4 @@
     {
         string Execute(string text);
     }
-
-    public interface IDefaultTopicProcesor
-    {
-        string GetTopic();
-    }
 }
