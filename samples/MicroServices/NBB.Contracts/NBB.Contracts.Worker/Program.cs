@@ -13,6 +13,7 @@ using Serilog.Events;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.MSSqlServer;
+using NBB.Contracts.PublishedLanguage;
 
 namespace NBB.Contracts.Worker
 {
@@ -44,7 +45,7 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    services.AddMessageBus().AddJetstreamTransport(hostingContext.Configuration);
 
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();

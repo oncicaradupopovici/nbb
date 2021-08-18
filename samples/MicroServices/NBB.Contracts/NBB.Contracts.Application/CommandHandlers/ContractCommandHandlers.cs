@@ -21,26 +21,26 @@ namespace NBB.Contracts.Application.CommandHandlers
 
         public async Task<Unit> Handle(CreateContract command, CancellationToken cancellationToken)
         {
-            var contract = new Contract(command.ClientId);
-            await _repository.SaveAsync(contract, cancellationToken);
+        //    var contract = new Contract(command.ClientId);
+        //    await _repository.SaveAsync(contract, cancellationToken);
 
             return Unit.Value;
         }
 
         public async Task<Unit> Handle(AddContractLine command, CancellationToken cancellationToken)
         {
-            var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
-            contract.AddContractLine(command.Product, command.Price, command.Quantity);
-            await _repository.SaveAsync(contract, cancellationToken);
+            //var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
+            //contract.AddContractLine(command.Product, command.Price, command.Quantity);
+            //await _repository.SaveAsync(contract, cancellationToken);
 
             return Unit.Value;
         }
 
         public async Task<Unit> Handle(ValidateContract command, CancellationToken cancellationToken)
         {
-            var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
-            contract.Validate();
-            await _repository.SaveAsync(contract, cancellationToken);
+            //var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
+            //contract.Validate();
+            //await _repository.SaveAsync(contract, cancellationToken);
 
             return Unit.Value;
         }

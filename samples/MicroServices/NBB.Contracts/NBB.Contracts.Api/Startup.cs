@@ -28,7 +28,7 @@ namespace NBB.Contracts.Api
             services.AddSingleton(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddMessageBus().AddNatsTransport(Configuration);
+            services.AddMessageBus().AddJetstreamTransport(Configuration);
 
             services.AddContractsReadModelDataAccess();
         }
