@@ -27,8 +27,8 @@ namespace NBB.Messaging.Nats
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
-            PushSubscribeOptionsBuilder psoBuilder = PushSubscribeOptions.Builder()
-                 .WithStream(_natsOptions.Value.Stream).WithDeliverSubject("deliver-ack");
+            PushSubscribeOptionsBuilder psoBuilder = PushSubscribeOptions.Builder();
+                 //.WithStream(_natsOptions.Value.Stream).WithDeliverSubject("deliver-ack");
 
             //var opts = ConnectionFactory.GetDefaultOptions();
             var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
@@ -45,6 +45,9 @@ namespace NBB.Messaging.Nats
             {
                 ccBuilder.WithDeliverPolicy(DeliverPolicy.All);
             }
+
+            // TODO: handle hardcoded value
+            ccBuilder.WithFilterSubject("LSNG.LIVIU.NBB.Contracts.PublishedLanguage.*");
 
             psoBuilder.WithConfiguration(ccBuilder.Build());
 
@@ -113,11 +116,11 @@ namespace NBB.Messaging.Nats
                 //    ? stanConnection.Subscribe(topic, _natsOptions.Value.QGroup, opts, StanMsgHandler)
                 //    : stanConnection.Subscribe(topic, opts, StanMsgHandler);
 
-                //StreamMustExist(connection);
+                StreamMustExist(connection);
                 IJetStream js = connection.CreateJetStreamContext();
 
                 subscription = subscriberOptions.UseGroup
-                                               ? js.PushSubscribeAsync(topic, _natsOptions.Value.QGroup, JetstreamMsgHandler, true) :
+                                               ? js.PushSubscribeAsync(topic, _natsOptions.Value.QGroup, JetstreamMsgHandler, false, pso) :
                                                  js.PushSubscribeAsync(topic, JetstreamMsgHandler, false, pso);
 
                 connection.Flush(500);
