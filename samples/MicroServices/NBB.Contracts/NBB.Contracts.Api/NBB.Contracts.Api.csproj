@@ -38,4 +38,10 @@
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="user.nk">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

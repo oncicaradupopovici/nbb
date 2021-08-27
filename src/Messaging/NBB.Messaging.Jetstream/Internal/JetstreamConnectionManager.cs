@@ -76,8 +76,9 @@ namespace NBB.Messaging.Nats.Internal
             var clientId = _natsOptions.Value.ClientId?.Replace(".", "_");
             var options = ConnectionFactory.GetDefaultOptions();
             options.Url = _natsOptions.Value.NatsUrl;
-            //options.Password = _natsOptions.Value.Password;
-            //options.User = _natsOptions.Value.User;
+            options.Password = _natsOptions.Value.Password;
+            options.User = _natsOptions.Value.User;
+            //options.SetNkey("UC2E5KVSC44GNNVGWZTDKOSJYX2FYREACOEUXW4QVR46MJBQEDSZN5BM", "./user.nk");
             options.ClosedEventHandler = (_, args) =>
             {
                 SetUnrecoverableState(args.Error ?? new Exception("NATS connection was lost"));
