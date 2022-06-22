@@ -19,7 +19,7 @@ Architectural considerations
 > The goal of software architecture is to minimize the human resources required to build and maintain the required system.
 >
 > -- <cite>Robert C. Martin</cite>
-
+csdcsdcsdcsdcsdcd
 With NBB you can power a great diversity of architectures from a Monolithic one to a Multi-Container Microservices based one.
 It is important to mention that NBB does not impose any kind of architecture.
 
